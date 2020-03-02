@@ -108,7 +108,7 @@ class Sudoku():
 
         # now hidden some numbers
 
-        hidden_number_count = random.randrange(int(self.max_number ** 2 / 4), int(self.max_number ** 2 * 3 / 4))
+        hidden_number_count = random.randrange(int(self.max_number ** 2 / 3), int(self.max_number ** 2 * 3 / 4))
         number_pos = [(row, column) for row in range(self.max_number) for column in range(self.max_number)]
         random.shuffle(number_pos)
         hidden_number_pos = number_pos[:hidden_number_count]

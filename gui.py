@@ -271,6 +271,13 @@ class TableLayer(cocos.layer.Layer):
             self.solved_sprite.kill()
             self.solved_sprite = None
 
+        if self.solved_music:
+            self.solved_music.stop()
+
+        if self.main_music:
+            self.main_music.stop()
+            self.title_music.play(-1)
+
         self.TimePassed = 0
         self.game_status = const.GAME_STATUS_MENU
 
