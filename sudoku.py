@@ -72,7 +72,26 @@ class Sudoku():
         random.shuffle(column_no)
         column_no = [_ for __ in column_no for _ in __]
 
-        
+        # swap the blocks in rows
+        block_row = [_ for _ in range(self.block_width)]
+        random.shuffle(block_row)
+
+        _row_no = row_no[:]
+        row_no = []
+        for block_no in block_row:
+            for _no in range(self.block_height):
+                row_no.append(_row_no[block_no * self.block_height + _no])
+
+        # swap the blocks in columns
+        block_column = [_ for _ in range(self.block_height)]
+        random.shuffle(block_column)
+
+        _column_no = column_no[:]
+        column_no = []
+        for block_no in block_column:
+            for _no in range(self.block_width):
+                column_no.append(_column_no[block_no * self.block_width + _no]) 
+
         # now get the number from the original matrix to 
         # set the value for the randomized matrix
         
@@ -89,7 +108,7 @@ class Sudoku():
 
         # now hidden some numbers
 
-        hidden_number_count = int(self.max_number ** 2 / 3)
+        hidden_number_count = random.randrange(int(self.max_number ** 2 / 4), int(self.max_number ** 2 * 3 / 4))
         number_pos = [(row, column) for row in range(self.max_number) for column in range(self.max_number)]
         random.shuffle(number_pos)
         hidden_number_pos = number_pos[:hidden_number_count]
