@@ -17,7 +17,7 @@ from const import const
 from gui import TableLayer
 
 
-cocos.director.director.init(width = 600, height = 800, caption = const.GAME_CAPTION + const.VERSION, resizable = False)
+cocos.director.director.init(width = const.WINDOW_WIDTH, height = const.WINDOW_HEIGHT, caption = const.GAME_CAPTION + const.VERSION, resizable = False)
 Game = TableLayer()
 main_scene = cocos.scene.Scene(Game)
 cocos.director.director.run(main_scene)

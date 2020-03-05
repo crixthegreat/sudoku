@@ -75,7 +75,7 @@ class TableLayer(cocos.layer.Layer):
         
         self.keys_pressed = set()
 
-        self.game_status = const.GAME_STATUS_MENU
+        self._game_status = const.GAME_STATUS_MENU
         
         self.game_mode = 3
 
@@ -88,8 +88,6 @@ class TableLayer(cocos.layer.Layer):
         self.main_music = None
         self.solved_music = None
 
-        self.title_music.play(-1)
-
         self.image = pyglet.resource.image(const.BG_IMAGE)
 
         self.Time_Label = cocos.text.Label('00:00',
@@ -97,14 +95,14 @@ class TableLayer(cocos.layer.Layer):
             font_name = 'Verdana', 
             bold = False, 
             color = const.COLOR_BLACK,
-            x = 5, y = 780)
+            x = 5, y = const.WINDOW_HEIGHT - 20)
 
         self.Version_Label = cocos.text.Label(const.VERSION,
             font_size = 16,
             font_name = 'Verdana', 
             bold = False, 
             color = const.COLOR_BLACK,
-            x = 550, y = 780)
+            x = const.WINDOW_WIDTH - 50, y = const.WINDOW_HEIGHT - 20)
 
         self.add(self.Time_Label)
         self.add(self.Version_Label)
@@ -114,17 +112,48 @@ class TableLayer(cocos.layer.Layer):
         #_bin = pyglet.image.atlas.TextureBin()
         #_anime.add_to_texture_bin(_bin)
         self.game_select_sprite = cocos.sprite.Sprite(const.GAME_SELECT_BOX_IMAGE,
-                position = (const.GAME_SELECT_BOX_START_POS[0] + self.game_mode * int(600/len(const.GAME_MODE)), const.GAME_SELECT_BOX_START_POS[1]), 
+                position = (const.GAME_SELECT_BOX_START_POS[0] + 
+                    self.game_mode * int(const.WINDOW_WIDTH/len(const.GAME_MODE)), 
+                    const.GAME_SELECT_BOX_START_POS[1]), 
                 scale = 0.8)
         self.add(self.game_select_sprite)
         self.game_select_sprite.do(actions.Blink(20, 10))
 
         self.exit_button = cocos.sprite.Sprite(const.EXIT_IMAGE,
-                position = (520, 781))
+                position = (const.WINDOW_WIDTH - 80, const.WINDOW_HEIGHT - 20))
         self.add(self.exit_button)
 
         self.mouse_x = None
         self.mouse_y = None
+
+        self.game_status = const.GAME_STATUS_MENU
+
+    @property
+    def game_status(self):
+        return self._game_status
+
+    @game_status.setter
+    def game_status(self, status):
+
+        mixer.stop()
+        if status == const.GAME_STATUS_MAIN:
+            self.game_select_sprite.stop()
+            self.game_select_sprite.visible = True
+            if self.main_music is None:
+                self.main_music = Audio(const.MAIN_MUSIC_FILE)
+            self.main_music.play(-1)
+        elif status == const.GAME_STATUS_MENU:
+            if self.title_music is None:
+                self.title_music = Audio(const.TITLE_MUSIC_FILE)
+            self.title_music.play(-1)
+        elif status == const.GAME_STATUS_SOLVED:
+            if self.solved_music is None:
+                self.solved_music = Audio(const.SOLVED_MUSIC_FILE)
+            self.solved_music.play(-1)
+        else:
+            raise Exception('UNKNOWN GAME STATUS:', status)
+
+        self._game_status = status
 
 
     @property
@@ -158,9 +187,6 @@ class TableLayer(cocos.layer.Layer):
                 self.game_select_sprite.do(actions.Blink(20, 10))
             return None
         elif self.game_status == const.GAME_STATUS_MAIN:
-            self.game_select_sprite.stop()
-            self.game_select_sprite.visible = True
-
             self.StartTimer += dt
             self.TimePassed += dt
             if self.StartTimer > 1:  # timer_interval
@@ -177,16 +203,16 @@ class TableLayer(cocos.layer.Layer):
 
         self.mouse_x, self.mouse_y = director.get_virtual_coordinates(x, y)
 
-        if self.game_status == const.GAME_STATUS_MENU and  720 > self.mouse_y > 640:
-            self.game_mode = int(self.mouse_x // (int(600/len(const.GAME_MODE))))
+        if self.game_status == const.GAME_STATUS_MENU and const.WINDOW_HEIGHT-80 > self.mouse_y > const.WINDOW_WIDTH + 40:
+            self.game_mode = int(self.mouse_x // (int(const.WINDOW_WIDTH/len(const.GAME_MODE))))
             self.game_select_sprite.position = (
-                    const.GAME_SELECT_BOX_START_POS[0] + self.game_mode * int(600/len(const.GAME_MODE)), 
+                    const.GAME_SELECT_BOX_START_POS[0] + self.game_mode * int(const.WINDOW_WIDTH/len(const.GAME_MODE)), 
                         const.GAME_SELECT_BOX_START_POS[1])
             
-        if self.game_status==const.GAME_STATUS_MAIN and self.mouse_y <= 600:
+        if self.game_status==const.GAME_STATUS_MAIN and self.mouse_y <= const.WINDOW_WIDTH:
 
-            row = self.game.max_number - int(self.mouse_y // (600/self.game.max_number)) - 1
-            column = int(self.mouse_x // (600/self.game.max_number))
+            row = self.game.max_number - int(self.mouse_y // (const.WINDOW_WIDTH/self.game.max_number)) - 1
+            column = int(self.mouse_x // (const.WINDOW_WIDTH/self.game.max_number))
     
             if self.selected_pos != (row, column):
                 last_pos = self.selected_pos
@@ -206,7 +232,7 @@ class TableLayer(cocos.layer.Layer):
         if self.game_status == const.GAME_STATUS_MENU and  720 > self.mouse_y > 640:
             self.start_game(self.game_mode)
 
-        if self.game_status== const.GAME_STATUS_MAIN and self.mouse_y <= 600:
+        if self.game_status== const.GAME_STATUS_MAIN and self.mouse_y <= const.WINDOW_WIDTH:
             if buttons == 1:
                 number = self.game.get_number(self.game.matrix, self.selected_pos)
                 if number and number<self.game.max_number:
@@ -230,7 +256,7 @@ class TableLayer(cocos.layer.Layer):
 
         for _ in range(max_number * max_number):
             _sprite = cocos.sprite.Sprite(const.CELL_IMAGE, 
-                    position=(_% max_number * int(600/max_number), 600 - _// max_number* int(600/max_number)), 
+                    position=(_% max_number * int(const.WINDOW_WIDTH/max_number), const.WINDOW_WIDTH - _// max_number* int(const.WINDOW_WIDTH/max_number)), 
                     color=const.COLOR_WHITE[:3],
                     scale=0.3/max_number*9 ,
                     anchor=(0,200)
@@ -240,8 +266,8 @@ class TableLayer(cocos.layer.Layer):
                     font_name = 'Verdana',
                     bold = True,
                     color = const.COLOR_BLACK,
-                    x = _%max_number*int(600/max_number) + int(100/max_number) ,
-                    y = 600- _//max_number*int(600/max_number)- int(450/max_number),
+                    x = _%max_number*int(const.WINDOW_WIDTH/max_number) + int(100/max_number) ,
+                    y = const.WINDOW_WIDTH- _//max_number*int(const.WINDOW_WIDTH/max_number)- int(450/max_number),
                     )
 
             cell = Cell(_sprite, _label)
@@ -256,9 +282,6 @@ class TableLayer(cocos.layer.Layer):
 
         self.game_initilise()
         
-        self.main_music = Audio(const.MAIN_MUSIC_FILE)
-        self.title_music.stop()
-        self.main_music.play(-1)
 
         self.solved_sprite = None
 
@@ -270,13 +293,6 @@ class TableLayer(cocos.layer.Layer):
         if self.solved_sprite:
             self.solved_sprite.kill()
             self.solved_sprite = None
-
-        if self.solved_music:
-            self.solved_music.stop()
-
-        if self.main_music:
-            self.main_music.stop()
-            self.title_music.play(-1)
 
         self.TimePassed = 0
         self.game_status = const.GAME_STATUS_MENU
@@ -334,6 +350,7 @@ class TableLayer(cocos.layer.Layer):
                 _cell.label.element.color = const.COLOR_GRAY
             else:
                 _cell.label.element.bold = False
+                _cell.label.element.color = const.COLOR_BLUE
 
         self.game_status = const.GAME_STATUS_MAIN
 
@@ -429,11 +446,8 @@ class TableLayer(cocos.layer.Layer):
     
 
     def game_win(self):
-        self.solved_music = Audio(const.SOLVED_MUSIC_FILE)
-        self.main_music.stop()
-        self.solved_music.play(-1)
-        self.game_status = const.GAME_STATUS_SOLVED
 
+        self.game_status = const.GAME_STATUS_SOLVED
         self.solved_sprite = cocos.sprite.Sprite(const.SOLVED_IMAGE, 
                 position = (300, 450), scale = 1)
         self.add(self.solved_sprite)

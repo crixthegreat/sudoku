@@ -20,8 +20,10 @@ const = Const()
 
 const.GAME_CAPTION = 'Sudoku by Crix '
 const.VERSION = 'v0.99'
+const.WINDOW_WIDTH, const.WINDOW_HEIGHT = 600, 800
 const.COLOR_RED = (255, 0, 0, 255)
 const.COLOR_GREEN = (0, 255, 0, 255)
+const.COLOR_BLUE = (0, 0, 255, 255)
 const.COLOR_BLACK = (0, 0, 0, 255)
 const.COLOR_WHITE = (255, 255, 255, 255)
 const.COLOR_GRAY = (0, 0, 0, 155)
