@@ -4,19 +4,19 @@
 
 - 一个数独游戏由宽高分别为 block_width,  block_height 的小方块组成
 
-    ![](.\readme_pic\1.png)
+    ![](https://github.com/crixthegreat/sudoku/blob/master/readme_pic/1.png)
 
 - 这样的游戏允许出现的最大数字为 max_number = block_width x block_height （假定最小为1） 
 
 - 为确保最终盘面为正方形，这样的方块的行与列数显然应为 row = block_width, column = block_height
 
-    ![image-20200302162751717](.\readme_pic\2.png)
+    ![image-20200302162751717](https://github.com/crixthegreat/sudoku/blob/master/readme_pic/2.png)
 
 - 块的总个数也为 max_number，而数字的总个数应为  (max_number)^ 2
 
 - 最常见的 9x9 的数独即由  (block_width=3) x (block_height=3) 的小方块组成，每个方块中最大的数 max_number 为 9 个，方块的个数也为 9 个，总数字的个数为 9^2 = 81
 
-    ![image-20200302162855145](.\readme_pic\3.png)
+    ![image-20200302162855145](https://github.com/crixthegreat/sudoku/blob/master/readme_pic/3.png)
 
 - 为计算方便，一个块作为一个列表存储，即 block = [number+1 for number in range(max_number)]
 
@@ -28,7 +28,7 @@
 
 - 一个标准的解可以简单用以下方法求得：
 
-    ![image-20200302163711038](.\readme_pic\4.png)
+    ![image-20200302163711038](https://github.com/crixthegreat/sudoku/blob/master/readme_pic/4.png)
 
     - 每一个块分别根据其所在的行与列，计算出其第一个数字，规律见上图。
 
@@ -42,13 +42,13 @@
 
     - 将数独的一个解的**同一个块内**的任意两行或两列交换，解仍然成立
 
-        ![image-20200302163236295](.\readme_pic\5.png)
+        ![image-20200302163236295](https://github.com/crixthegreat/sudoku/blob/master/readme_pic/5.png)
 
-        ![image-20200302163210304](.\readme_pic\6.png)
+        ![image-20200302163210304](https://github.com/crixthegreat/sudoku/blob/master/readme_pic/6.png)
 
     - 将数独的任意两行或两列的**整块数据**交换，解仍然成立
 
-        ![image-20200302163545288](.\readme_pic\7.png)
+        ![image-20200302163545288](https://github.com/crixthegreat/sudoku/blob/master/readme_pic/7.png)
 
 其余就是大量枯燥的 GUI 工作了。
 
